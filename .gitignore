@@ -1,0 +1,6 @@
+/bin/jaz/Eval.class
+/bin/jaz/Parser.class
+/bin/jaz/SymbolTable.class
+/bin/jaz/Interpreter.class
+/bin/jaz/Env.class
+/.gitignore~
