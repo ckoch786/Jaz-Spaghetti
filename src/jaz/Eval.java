@@ -39,6 +39,10 @@ public class Eval {
 				//memory.get(l.rest().trim()).push("0");
 				executionStack.push(l.rest().trim());
 			} else if (l.head().equals("rvalue")) {
+				if (memory.get(l.rest().trim()) == null) {
+					memory.put(l.rest(), new Stack<String>());
+					memory.get(l.rest().trim()).push("0");
+				}
 				String value = memory.get(l.rest().trim()).peek();
 				executionStack.push(value == null?"0":value);
 			} else if (l.head().equals(":=")) {
@@ -54,38 +58,41 @@ public class Eval {
 				int x = op1 + op2;
 				executionStack.push(String.valueOf(x));
 			} else if (l.head().equals("-")) {
-				int op1 = Integer.parseInt((String)executionStack.pop());
 				int op2 = Integer.parseInt((String)executionStack.pop());
+				int op1 = Integer.parseInt((String)executionStack.pop());
 				int x = op1 - op2;
 				executionStack.push(String.valueOf(x));
 			} else if (l.head().equals("*")) {
-				int op1 = Integer.parseInt((String)executionStack.pop());
 				int op2 = Integer.parseInt((String)executionStack.pop());
+				int op1 = Integer.parseInt((String)executionStack.pop());
 				int x = op1 * op2;
 				executionStack.push(String.valueOf(x));
 			} else if (l.head().equals("/")) {
-				int op1 = Integer.parseInt((String)executionStack.pop());
 				int op2 = Integer.parseInt((String)executionStack.pop());
+				int op1 = Integer.parseInt((String)executionStack.pop());
 				int x = op1 / op2;
 				executionStack.push(String.valueOf(x));
 			} else if (l.head().equals("div")) {
-				int op1 = Integer.parseInt((String)executionStack.pop());
 				int op2 = Integer.parseInt((String)executionStack.pop());
+				int op1 = Integer.parseInt((String)executionStack.pop());
 				int x = op1 % op2;
 				executionStack.push(String.valueOf(x));
 			} else if (l.head().equals("&")) {
-				int op1 = Integer.parseInt((String)executionStack.pop());
 				int op2 = Integer.parseInt((String)executionStack.pop());
+				int op1 = Integer.parseInt((String)executionStack.pop());
 				int x = op1 & op2;
 				executionStack.push(String.valueOf(x));
 			} else if (l.head().equals("|")) {
-				int op1 = Integer.parseInt((String)executionStack.pop());
 				int op2 = Integer.parseInt((String)executionStack.pop());
+				int op1 = Integer.parseInt((String)executionStack.pop());
 				int x = op1 | op2;
 				executionStack.push(String.valueOf(x));
 			} else if (l.head().equals("!")) {
 				int op1 = Integer.parseInt((String)executionStack.pop());
-				int x = op1 * -1;
+				int x = 1;
+				if (op1 == 0) {
+					x = 1;
+				}
 				executionStack.push(String.valueOf(x));
 			} else if (l.head().equals("goto")) {
 				int lineNumberOfLabel = Parser.environment.getLabel(l.rest());
@@ -103,11 +110,91 @@ public class Eval {
 				lineNumber = lineNumberOfLabel;
 			} else if (l.head().equals("halt")) {
 				System.exit(0);
-			} else if (l.head().equals("gototrue")){
-				//TODO
-			} else if (l.head().equals("gotofalse")) {
-				//TODO
-			}
+			} else if (l.head().equals("gotrue")){
+				int op1 = Integer.parseInt((String)executionStack.pop());
+				if (op1 != 0) {
+					int lineNumberOfLabel = Parser.environment.getLabel(l.rest());
+					lineNumber = lineNumberOfLabel;
+				}
+			} else if (l.head().equals("gofalse")) {
+				int op1 = Integer.parseInt((String)executionStack.pop());
+				if (op1 == 0) {
+					int lineNumberOfLabel = Parser.environment.getLabel(l.rest());
+					lineNumber = lineNumberOfLabel;
+				}
+			} else if (l.head().equals("<>")) {
+				int op2 = Integer.parseInt((String)executionStack.pop());
+				int op1 = Integer.parseInt((String)executionStack.pop());
+				if (op1 != op2) {
+					executionStack.push(String.valueOf(op2));
+					executionStack.push(String.valueOf(op1));
+					executionStack.push(String.valueOf(1));
+				} else {
+					executionStack.push(String.valueOf(op2));
+					executionStack.push(String.valueOf(op1));
+					executionStack.push(String.valueOf(0));
+				}
+			} else if (l.head().equals("<=")) {
+				int op2 = Integer.parseInt((String)executionStack.pop());
+				int op1 = Integer.parseInt((String)executionStack.pop());
+				if (op1 <= op2) {
+					executionStack.push(String.valueOf(op2));
+					executionStack.push(String.valueOf(op1));
+					executionStack.push(String.valueOf(1));
+				} else {
+					executionStack.push(String.valueOf(op2));
+					executionStack.push(String.valueOf(op1));
+					executionStack.push(String.valueOf(0));
+				}
+			} else if (l.head().equals(">=")) {
+				int op2 = Integer.parseInt((String)executionStack.pop());
+				int op1 = Integer.parseInt((String)executionStack.pop());
+				if (op1 >= op2) {
+					executionStack.push(String.valueOf(op2));
+					executionStack.push(String.valueOf(op1));
+					executionStack.push(String.valueOf(1));
+				} else {
+					executionStack.push(String.valueOf(op2));
+					executionStack.push(String.valueOf(op1));
+					executionStack.push(String.valueOf(0));
+				}
+			} else if (l.head().equals("<")) {
+				int op2 = Integer.parseInt((String)executionStack.pop());
+				int op1 = Integer.parseInt((String)executionStack.pop());
+				if (op1 < op2) {
+					executionStack.push(String.valueOf(op2));
+					executionStack.push(String.valueOf(op1));
+					executionStack.push(String.valueOf(1));
+				} else {
+					executionStack.push(String.valueOf(op2));
+					executionStack.push(String.valueOf(op1));
+					executionStack.push(String.valueOf(0));
+				}
+			} else if (l.head().equals(">")) {
+				int op2 = Integer.parseInt((String)executionStack.pop());
+				int op1 = Integer.parseInt((String)executionStack.pop());
+				if (op1 > op2) {
+					executionStack.push(String.valueOf(op2));
+					executionStack.push(String.valueOf(op1));
+					executionStack.push(String.valueOf(1));
+				} else {
+					executionStack.push(String.valueOf(op2));
+					executionStack.push(String.valueOf(op1));
+					executionStack.push(String.valueOf(0));
+				}
+			} else if (l.head().equals("=")) {
+				int op2 = Integer.parseInt((String)executionStack.pop());
+				int op1 = Integer.parseInt((String)executionStack.pop());
+				if (op1 == op2) {
+					executionStack.push(String.valueOf(op2));
+					executionStack.push(String.valueOf(op1));
+					executionStack.push(String.valueOf(1));
+				} else {
+					executionStack.push(String.valueOf(op2));
+					executionStack.push(String.valueOf(op1));
+					executionStack.push(String.valueOf(0));
+				}
+			} 
 			lineNumber++;
 		}
 		

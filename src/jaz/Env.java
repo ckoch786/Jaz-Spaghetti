@@ -14,6 +14,7 @@ public class Env {
 	private Map<String,Integer> environment  = new HashMap<String, Integer>();
 	private int callee;
 
+	private boolean inProcedure;
 	/**
 	 * Keep track of local variables by pushing them onto the stack.
 	 * When we return to the caller we will pop the values off 
@@ -27,6 +28,7 @@ public class Env {
 	
 	Env() {
 		tape = new ArrayList<JazList <String, String>>();
+		inProcedure = false;
 	}
 	
 	/**
@@ -58,4 +60,11 @@ public class Env {
 		environment.put(labelName, lineNumber);
 	}
 	
+	public void inProcedure() {
+		inProcedure = true;
+	}
+	
+	public boolean isInProcedure() {
+		return inProcedure;
+	}
 } 
