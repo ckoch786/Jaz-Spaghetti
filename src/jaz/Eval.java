@@ -6,10 +6,12 @@ import java.util.Stack;
 
 public class Eval {
 	
+	// TODO refactor these to the Env class
 	private Stack<Object> executionStack = new Stack<Object>();
 	private Map<String, Stack<String>> memory = new HashMap<String, Stack<String>>();
 	private Map<String, Stack<String>> procMemory = new HashMap<String, Stack<String>>();;
 	
+	// TODO refactor this crap to use iterator and move the looping to Iterpreter
 	Eval () {
 		
 		String prompt; // factor this out to a function.
@@ -83,7 +85,6 @@ public class Eval {
 				int lineNumberOfLabel = Parser.environment.getLabel(l.rest());
 				lineNumber = lineNumberOfLabel;
 			} else if (l.head().equals("begin")){
-				//TODO
 				Parser.environment.setInProcedure(true);
 			} else if (l.head().equals("end")){
 				end();
@@ -171,6 +172,7 @@ public class Eval {
 		}
 	}
 
+	//TODO find a better way to implement assign, lvalue, and rvalue; this smells like poo.
 	private void rvalue(JazList<String, String> l) {
 		/*For rvalue we want to use the global scope if we are in parameter passing mode or anywhere else
 		 * outside a function.
