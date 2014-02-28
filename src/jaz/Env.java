@@ -25,10 +25,12 @@ public class Env {
 	private Stack<String> procedureStack = new Stack<String>();
 	
 	private List<JazList<String, String>> tape;
+	private boolean afterCall;
 	
 	Env() {
 		tape = new ArrayList<JazList <String, String>>();
 		inProcedure = false;
+		afterCall = false;
 	}
 	
 	/**
@@ -60,11 +62,21 @@ public class Env {
 		environment.put(labelName, lineNumber);
 	}
 	
-	public void inProcedure() {
-		inProcedure = true;
-	}
-	
 	public boolean isInProcedure() {
 		return inProcedure;
 	}
+
+	public void setInProcedure(boolean b) {
+		inProcedure = b;
+	}
+
+	public boolean isAfterCall() {
+		// TODO Auto-generated method stub
+		return afterCall;
+	}
+	
+	public void setAfterCall(boolean b) {
+		afterCall = b;
+	}
+	
 } 
