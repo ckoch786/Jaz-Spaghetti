@@ -34,7 +34,12 @@ public class Eval {
 				System.out.println(prompt+executionStack.pop());
 			} else if (l.head().equals("lvalue")) {
 				// If we are in a procedure then use the procedure memory stack.
-				if (Parser.environment.isInProcedure() && 
+				if (Parser.environment.isRecursive()) {
+					if (procMemory.get(l.rest().trim()) == null) {
+						procMemory.put(l.rest(), "0");
+					}
+					executionStack.push(l.rest().trim());
+				} else if (Parser.environment.isInProcedure() && 
 						!Parser.environment.isAfterCall()) { // We are in procedure(in top of begin block) and before the call.
 					if (procMemory.get(l.rest().trim()) == null) {
 						procMemory.put(l.rest(), "0");
@@ -62,6 +67,7 @@ public class Eval {
 					//memory.get(l.rest().trim()).push("0");
 					executionStack.push(l.rest().trim());
 				}
+				
 			} else if (l.head().equals("rvalue")) {
 				/*For rvalue we want to use the global scope if we are in parameter passing mode or anywhere else
 				 * outside a function.
@@ -74,7 +80,10 @@ public class Eval {
 //						&& !Parser.environment.isAfterCall()) { // in param passing or function 
 //					
 //				} 
-				if (!Parser.environment.isInProcedure() &&
+				if (Parser.environment.isRecursive()) {
+					String value = procMemory.get(l.rest().trim());
+					executionStack.push(value == null?"0":value);
+				} else if (!Parser.environment.isInProcedure() &&
 						Parser.environment.isAfterCall()) { // We are under the call at the bottom of the begin block, returning values to global scope
 					String value = procMemory.get(l.rest().trim());
 					executionStack.push(value == null?"0":value);
@@ -98,11 +107,14 @@ public class Eval {
 					String value = memory.get(l.rest().trim()).peek();
 					executionStack.push(value == null?"0":value);
 				}
+				
 			} else if (l.head().equals(":=")) {
 				String value = (String) executionStack.pop();
 				String varname = (String) executionStack.pop();
 				
-				if (Parser.environment.isInProcedure() &&
+				if (Parser.environment.isRecursive()) {
+					procMemory.put(varname, value);
+				} else if (Parser.environment.isInProcedure() &&
 						!Parser.environment.isAfterCall()) { // We are in procedure(in top of begin block) and before the call.
 					procMemory.put(varname, value);	
 				} else if (Parser.environment.isInProcedure() &&
@@ -120,6 +132,7 @@ public class Eval {
 					}
 					memory.get(varname).push(value);
 				}
+				
 			} else if (l.head().equals("+")) {
 				int op1 = Integer.parseInt((String)executionStack.pop());
 				int op2 = Integer.parseInt((String)executionStack.pop());
@@ -167,20 +180,25 @@ public class Eval {
 				lineNumber = lineNumberOfLabel;
 			} else if (l.head().equals("begin")){
 				//TODO
-				Parser.environment.setAfterCall(false);
 				Parser.environment.setInProcedure(true);
-				//procMemory = new HashMap<String, String>(); // Create a new procedure memory
 			} else if (l.head().equals("end")){
 				//TODO
-				Parser.environment.setInProcedure(false);
-				Parser.environment.setAfterCall(false);
+				if (!Parser.environment.stillCalling()) {
+					Parser.environment.setInProcedure(false);
+					Parser.environment.setAfterCall(false);
+				}
 				
 			} else if (l.head().equals("return")) {
 				lineNumber = Parser.environment.endProcedure(); //return to caller
+				Parser.environment.resetRecursive();
+				Parser.environment.resetCallDepth();
 				Parser.environment.setInProcedure(false);
 			} else if (l.head().equals("call")) {
 				Parser.environment.setAfterCall(true);
+				Parser.environment.setInProcedure(true);
 				Parser.environment.startProcedure(lineNumber); // Save line number of callee
+				Parser.environment.incRecursive();
+				Parser.environment.incCallDepth();
 				int lineNumberOfLabel = Parser.environment.getLabel(l.rest());
 				lineNumber = lineNumberOfLabel;
 			 

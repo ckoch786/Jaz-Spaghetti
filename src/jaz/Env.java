@@ -12,7 +12,7 @@ import java.util.Stack;
  */
 public class Env {
 	private Map<String,Integer> environment  = new HashMap<String, Integer>();
-	private int callee;
+	private Stack<Integer> callee = new Stack<Integer>();
 
 	private boolean inProcedure;
 	/**
@@ -22,15 +22,16 @@ public class Env {
 	 * 
 	 * storage for the names of local variables
 	 */
-	private Stack<String> procedureStack = new Stack<String>();
+	// TODO would this have been a better way?
+	//private Stack<String> procedureStack = new Stack<String>();
 	
-	private List<JazList<String, String>> tape;
 	private boolean afterCall;
+	private int recursive;
 	
 	Env() {
-		tape = new ArrayList<JazList <String, String>>();
 		inProcedure = false;
 		afterCall = false;
+		recursive = 0;
 	}
 	
 	/**
@@ -38,7 +39,7 @@ public class Env {
 	 * 
 	 */
 	public void startProcedure(int lineNumber) {
-		callee = lineNumber;
+		callee.push(lineNumber);
 	}
 	
 	/**
@@ -46,7 +47,7 @@ public class Env {
 	 * @return
 	 */
 	public int endProcedure() {
-		return callee;
+		return callee.pop();
 	}
 	
 	public int getLabel(String lableName) {
@@ -78,5 +79,39 @@ public class Env {
 	public void setAfterCall(boolean b) {
 		afterCall = b;
 	}
+
+	public void resetRecursive() {
+		// TODO Auto-generated method stub
+		recursive--;
+		
+	}
+
+	public void incRecursive() {
+		// TODO Auto-generated method stub
+		recursive++;
+	}
 	
+	public int getRecursive() {
+		return recursive;
+	}
+	
+	public boolean isRecursive() {
+		return recursive > 0;
+	}
+
+	public boolean stillCalling() {
+		// TODO Auto-generated method stub
+		return this.isRecursive();
+	}
+
+	public void resetCallDepth() {
+		// TODO Auto-generated method stub
+		this.resetRecursive();
+		
+	}
+
+	public void incCallDepth() {
+		// TODO Auto-generated method stub
+		this.incRecursive();
+	}
 } 
