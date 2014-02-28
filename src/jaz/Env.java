@@ -27,11 +27,13 @@ public class Env {
 	
 	private boolean afterCall;
 	private int recursive;
+	private boolean returning;
 	
 	Env() {
 		inProcedure = false;
 		afterCall = false;
 		recursive = 0;
+		returning = false;
 	}
 	
 	/**
@@ -113,5 +115,16 @@ public class Env {
 	public void incCallDepth() {
 		// TODO Auto-generated method stub
 		this.incRecursive();
+	}
+
+	public void setReturning(boolean b) {
+		// TODO Auto-generated method stub
+		returning = b;
+		
+	}
+
+	public boolean isReturning() {
+		// TODO Auto-generated method stub
+		return returning;
 	}
 } 

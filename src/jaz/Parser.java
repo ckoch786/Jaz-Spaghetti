@@ -27,7 +27,7 @@ public class Parser {
 	}
 
 	private int parse(String t, int lineNumber) {
-		System.out.println("adding: " + t);
+		//System.out.println("adding: " + t);
 		t = t.trim();// remove white space from indentation
 		String head = t.split(" ")[0].trim();
 		String rest = t.substring(t.split(" ")[0].length()).trim();

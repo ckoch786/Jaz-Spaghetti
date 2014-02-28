@@ -22,7 +22,7 @@ public class Eval {
 		JazList<String, String> l = SymbolTable.symbolTable.get(lineNumber);
 		while (l.head() != "halt") {
 			l = SymbolTable.symbolTable.get(lineNumber);
-			System.out.println("Handling token: "+l.head() + ", " + l.rest());
+			//System.out.println("Handling token: "+l.head() + ", " + l.rest());
 			if (l.head().equals("show")) { 
 				show(prompt, l);
 			} else if (l.head().equals("push")) {
@@ -269,6 +269,7 @@ public class Eval {
 		Parser.environment.resetRecursive();
 		Parser.environment.resetCallDepth();
 		Parser.environment.setInProcedure(false);
+		Parser.environment.setReturning(true);
 		return lineNumber;
 	}
 
@@ -278,6 +279,7 @@ public class Eval {
 		Parser.environment.startProcedure(lineNumber); // Save line number of callee
 		Parser.environment.incRecursive();
 		Parser.environment.incCallDepth();
+		Parser.environment.setReturning(false);
 		int lineNumberOfLabel = Parser.environment.getLabel(l.rest());
 		lineNumber = lineNumberOfLabel;
 		return lineNumber;
@@ -308,11 +310,16 @@ public class Eval {
 	}
 
 	private void procMemoryGet(JazList<String, String> l) {
+		String value;
 		if (procMemory.get(l.rest().trim()) == null) {
 			procMemory.put(l.rest(), new Stack<String>());
 			procMemory.get(l.rest().trim()).push("0");
 		}
-		String value = procMemory.get(l.rest().trim()).peek();
+		if (Parser.environment.isRecursive()&& Parser.environment.isReturning()) {
+			value = procMemory.get(l.rest().trim()).pop();
+		} else {
+			value = procMemory.get(l.rest().trim()).peek();
+		}
 		executionStack.push(value == null?"0":value);
 	}
 
